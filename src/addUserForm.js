@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 
-import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
+import TextField from "@material-ui/core/TextField";
+
+import "./styles.css";
 
 const AddUserForm = props => {
-  
-  const initialFormState = { id: null, first_name: "", email: ""};
+  const initialFormState = { id: null, first_name: "", email: "" };
   const [user, setUser] = useState(initialFormState);
 
   const handleInputChange = event => {
-    console.log("onSubmit")
+    console.log("onSubmit");
     const { name, value } = event.target;
     setUser({ ...user, [name]: value });
   };
@@ -45,9 +45,9 @@ const AddUserForm = props => {
         value={user.email}
         onChange={handleInputChange}
       />
-      <br/>
-      <Button variant="contained">Add new user</Button>
-      <br/>
+      <br />
+      <button variant="contained">Add new user</button>
+      <br />
     </form>
   );
 };
