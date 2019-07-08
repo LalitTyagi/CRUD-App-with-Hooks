@@ -1,29 +1,27 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import axios from 'axios';
+import axios from "axios";
 
-import { makeStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
-import TextField from '@material-ui/core/TextField';
-
-
-import AddUserForm from "./addUserForm.js";
-import EditUserForm from "./editUserForm.js";
 import UserTable from "./userTable.js";
+import AddUserForm from "./AddUserForm.js";
+import EditUserForm from "./editUserForm.js";
 
-import './style.css';
+import { makeStyles } from "@material-ui/core/styles";
+import Paper from "@material-ui/core/Paper";
+import Typography from "@material-ui/core/Typography";
+import TextField from "@material-ui/core/TextField";
+
+import "./styles.css";
 
 const useStyles = makeStyles(theme => ({
   root: {
-    padding: theme.spacing(3, 2),
-  },
+    padding: theme.spacing(3, 2)
+  }
 }));
 
 const App = () => {
-
   const classes = useStyles();
-
+  
   const [count, setCount] = useState(1);
 
   const [sortName, setNameSort] = useState(1);
@@ -32,114 +30,123 @@ const App = () => {
 
   const [users, setUsers] = useState({ hits: [] });
 
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState("");
 
   const [, setSortedUsers] = useState(users);
 
-  const initialFormState = { id: null, first_name: '', email: '' }
-  const [ currentUser, setCurrentUser ] = useState(initialFormState)
-  const [ editing, setEditing ] = useState(false)
+  const initialFormState = { id: null, first_name: "", email: "" };
+  const [currentUser, setCurrentUser] = useState(initialFormState);
+  const [editing, setEditing] = useState(false);
 
-  async function fetchData (count){
-      const result = await axios(`https://reqres.in/api/users?page=${count}`);
-      setUsers(result.data.data);
-    };
-
+  async function fetchData(count) {
+    const result = await axios(`https://reqres.in/api/users?page=${count}`);
+    setUsers(result.data.data);
+  }
 
   useEffect(() => {
     fetchData(count);
   }, [count]);
 
-  // CRUD operations
   const addUser = user => {
-    console.log('addUser')
-    user.id = users.length + 2
-    setUsers([ ...users, user ])
-  }
-  const deleteUser = id => {
-    setEditing(false)
-    setUsers(users.filter(user => user.id !== id))
-  }
+    user.id = users[users.length - 1].id + 1;
+    setUsers([...users, user]);
+  };
+
+  const editRow = user => {
+    setEditing(true);
+    setCurrentUser({
+      id: user.id,
+      first_name: user.first_name,
+      email: user.email
+    });
+  };
 
   const updateUser = (id, updatedUser) => {
-    setEditing(false)
+    setEditing(false);
+    setUsers(users.map(user => (user.id === id ? updatedUser : user)));
+  };
 
-    setUsers(users.map(user => (user.id === id ? updatedUser : user)))
-  }
-  const editRow = user => {
-    setEditing(true)
-    setCurrentUser({ id: user.id, first_name: user.first_name, email: user.email })
-  }
+  const deleteUser = id => {
+    setEditing(false);
+    setUsers(users.filter(user => user.id !== id));
+  };
 
-  const handleInputChange=(e)=>{
+  const handleInputSearch = e => {
     // console.log("handleInputChange",e.target.value)
-    setSearchValue(e.target.value)
-    let newArr = []
+    setSearchValue(e.target.value);
+    let newArr = [];
     let tempUser = users;
 
     tempUser.map(user => {
-      if((user.first_name.indexOf(e.target.value)>-1) || (user.email.indexOf(e.target.value)>-1)){
-        console.log("123456",user)
-        newArr.push(user)
-        }
-      })
+      if (
+        user.first_name.indexOf(e.target.value) > -1 ||
+        user.email.indexOf(e.target.value) > -1
+      ) {
+        console.log("123456", user);
+        newArr.push(user);
+      }
+    });
 
-      // console.log("newArr",newArr)
+    // console.log("newArr",newArr)
 
-      setUsers(newArr)
-  }
+    setUsers(newArr);
+  };
 
-  const goToLeftSlide=()=>{
+  const goToLeftSlide = () => {
     // console.log("goToLeftSlide")
-    if(count===1){
-      setCount(4)
-    }else{
-      setCount(count - 1)
+    if (count === 1) {
+      setCount(4);
+    } else {
+      setCount(count - 1);
     }
     // console.log(count)
-  }
-  const goToRightSlide=()=>{
+  };
+  const goToRightSlide = () => {
     // console.log("goToRightSlide")
-    if(count===4){
-      setCount(1)
-    }else{
-      setCount(count + 1)
+    if (count === 4) {
+      setCount(1);
+    } else {
+      setCount(count + 1);
     }
     // console.log(count)
-  }
+  };
 
-  const shortById=()=>{
-    if(sortId===1){
-      setSortedUsers(users.sort((a, b) => (a.id > b.id) ? 1 : -1))
-      setIdSort(0)
-    }else{
-      setSortedUsers(users.sort((a, b) => (a.id < b.id) ? 1 : -1))
-      setIdSort(1)
+  const shortById = () => {
+    if (sortId === 1) {
+      setSortedUsers(users.sort((a, b) => (a.id > b.id ? 1 : -1)));
+      setIdSort(0);
+    } else {
+      setSortedUsers(users.sort((a, b) => (a.id < b.id ? 1 : -1)));
+      setIdSort(1);
     }
-  }
-  const shortByName=()=>{
-    if(sortName===1){
-      setSortedUsers(users.sort((a, b) => (a.first_name > b.first_name) ? 1 : -1))
-      setNameSort(0)
-    }else{
-      setSortedUsers(users.sort((a, b) => (a.first_name < b.first_name) ? 1 : -1))
-      setNameSort(1)
-    }  
-  }
-  const shortByEmail=()=>{
-    if(sortEmail===1){
-      setSortedUsers(users.sort((a, b) => (a.email > b.email) ? 1 : -1))
-      setEmailSort(0)
-    }else{
-      setSortedUsers(users.sort((a, b) => (a.email < b.email) ? 1 : -1))
-      setEmailSort(1)
-    } 
-  }
+  };
+  const shortByName = () => {
+    if (sortName === 1) {
+      setSortedUsers(
+        users.sort((a, b) => (a.first_name > b.first_name ? 1 : -1))
+      );
+      setNameSort(0);
+    } else {
+      setSortedUsers(
+        users.sort((a, b) => (a.first_name < b.first_name ? 1 : -1))
+      );
+      setNameSort(1);
+    }
+  };
+  const shortByEmail = () => {
+    if (sortEmail === 1) {
+      setSortedUsers(users.sort((a, b) => (a.email > b.email ? 1 : -1)));
+      setEmailSort(0);
+    } else {
+      setSortedUsers(users.sort((a, b) => (a.email < b.email ? 1 : -1)));
+      setEmailSort(1);
+    }
+  };
 
   return (
     <div>
       <Paper className={classes.root}>
-        <Typography variant="h2" component="h3" align = "center">
+        <Typography variant="h2" component="h3" align="center">
           CRUD App with Hooks
         </Typography>
       </Paper>
@@ -147,7 +154,9 @@ const App = () => {
         <div>
           {editing ? (
             <>
-              <Typography variant="h3" align = "center">Edit user</Typography>
+              <Typography variant="h3" align="center">
+                Edit user
+              </Typography>
               <EditUserForm
                 editing={editing}
                 setEditing={setEditing}
@@ -157,42 +166,51 @@ const App = () => {
             </>
           ) : (
             <>
-              <Typography variant="h3" align = "center">Add user</Typography>
+              <Typography variant="h3" align="center">
+                Add user
+              </Typography>
               <AddUserForm addUser={addUser} />
             </>
           )}
         </div>
         <div>
-          <br/>
-          <Typography variant="h3" align = "center">Search User</Typography>
+          <br />
+          <Typography variant="h3" align="center">
+            Search User
+          </Typography>
           <TextField
-            align = "left"
+            align="left"
             id="outlined-required"
             label="Search"
             margin="normal"
             variant="outlined"
-            name="first_name"
             value={searchValue}
-            onChange={handleInputChange} 
+            onChange={handleInputSearch}
           />
-          <Typography variant="h3" align = "center">View users</Typography>
-          <UserTable 
-            users={users} 
-            editRow={editRow} 
+          <Typography variant="h3" align="center">
+            View users
+          </Typography>
+          <UserTable
+            users={users}
+            editRow={editRow}
             deleteUser={deleteUser}
             shortById={shortById}
             shortByName={shortByName}
             shortByEmail={shortByEmail}
-            />
+          />
         </div>
-        <br/>
+        <br />
         <div class="pagination">
-          <a href="#" onClick={ goToLeftSlide }>❮</a>
-          <a href="#" onClick={ goToRightSlide }>❯</a>
+          <a href="#" onClick={goToLeftSlide}>
+            ❮
+          </a>
+          <a href="#" onClick={goToRightSlide}>
+            ❯
+          </a>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default App;
