@@ -9,6 +9,7 @@ It is having following features:
 5. Add new User
 6. Edit User details
 
+# How to run this app
 ```
 git clone git@github.com:LalitTyagi/React_Carousel_Slideshow.git
 npm install --save
